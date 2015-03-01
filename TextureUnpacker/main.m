@@ -21,11 +21,20 @@ void unpackTextureFromeAtlasByPlist( NSString * plistFullPathName ){
     NSArray * keys = [frames allKeys];
     for( NSString * key in keys ){
         NSDictionary * img = [frames objectForKey:key];
+#ifdef LEGACY_FORMAT
+        NSRect sprFrame = NSMakeRect([[img objectForKey:@"x"] integerValue], [[img objectForKey:@"y"] integerValue],
+									 [[img objectForKey:@"width"] integerValue], [[img objectForKey:@"height"] integerValue]);
+        NSRect texFrame = sprFrame;
+        NSPoint offset = NSMakePoint([[img objectForKey:@"offsetX"] integerValue], [[img objectForKey:@"offsetY"] integerValue]);
+        NSSize sourceSize = NSMakeSize([[img objectForKey:@"originalWidth"] integerValue], [[img objectForKey:@"originalHeight"] integerValue]);
+        BOOL isRotated = NO;
+#else
         NSRect sprFrame = NSRectFromString([img objectForKey:@"frame"]);
         NSRect texFrame = sprFrame;
         NSPoint offset = NSPointFromString([img objectForKey:@"offset"]);
         NSSize sourceSize = NSSizeFromString([img objectForKey:@"sourceSize"]);
         BOOL isRotated = [[img objectForKey:@"rotated"] boolValue];
+#endif
         NSPoint targetPoint = NSMakePoint( ( sourceSize.width - sprFrame.size.width)/2 + offset.x ,
                                           (sourceSize.height - sprFrame.size.height )/2  + offset.y);
         if(isRotated){
